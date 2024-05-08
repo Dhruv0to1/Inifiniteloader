@@ -1,0 +1,20 @@
+.scrollBar {
+  overflow: scroll;
+  background-color: beige;
+  height: 475px;
+  display: flex;
+  flex-direction: column;
+}
+.image {
+  /* border-color: black; */
+  border: 2px solid black;
+}
+.imageDiv {
+  padding: 5px 0px 2px 10px;
+}
+.headingTag {
+  font-size: 1em;
+}
+.spinner {
+  align-self: center;
+}
