@@ -4,24 +4,25 @@ import { Spinner } from "@chakra-ui/react";
 
 export default function MyPage() {
   const [result, setResult] = useState([]);
-  const [page, setPage] = useState(1);
   const [loader, setLoader] = useState(false);
+  const [multiple, setMultiple] = useState(6);
 
   useEffect(() => {
-    fetch(`https://dummyjson.com/products?limit=6&page=${page}`)
+    fetch(`https://dummyjson.com/products?limit=${multiple}`)
       .then((data) => {
         return data.json();
       })
       .then((data) => {
+        console.log(multiple);
         console.log(data.products);
         setResult([...result, ...data.products]);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [page]);
+  }, [multiple]);
   function scrollHandle(e) {
-    console.log(e);
+    // console.log(e);
     if (
       e.target.offsetHeight + e.target.scrollTop + 1 >
       e.target.scrollHeight
@@ -34,7 +35,7 @@ export default function MyPage() {
       });
       examplePromise
         .then((data) => {
-          setPage(page + 1);
+          setMultiple(multiple + 6);
           setLoader(false);
         })
         .catch((data) => {
@@ -53,9 +54,8 @@ export default function MyPage() {
       >
         {result.map((item, i) => {
           return (
-            <div className="imageDiv">
+            <div className="imageDiv" key={i}>
               <img
-                key={i}
                 src={item.images[0]}
                 alt={`Image with Id: ${item.id}`}
                 className="image"
