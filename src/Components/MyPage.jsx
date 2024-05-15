@@ -6,9 +6,13 @@ export default function MyPage() {
   const [result, setResult] = useState([]);
   const [loader, setLoader] = useState(false);
   const [multiple, setMultiple] = useState(6);
+  const [show, setShow] = useState(0);
+  let counter = 0;
 
   useEffect(() => {
-    fetch(`https://dummyjson.com/products?limit=${multiple}`)
+    let val = 6 * counter;
+    let res = multiple - val;
+    fetch(`https://dummyjson.com/products?limit=${6}&skip=${res}`)
       .then((data) => {
         return data.json();
       })
@@ -16,31 +20,27 @@ export default function MyPage() {
         console.log(multiple);
         console.log(data.products);
         setResult([...result, ...data.products]);
+        counter = counter + 1;
       })
       .catch((err) => {
         console.log(err);
       });
   }, [multiple]);
+
+  useEffect(() => {
+    if (show === 1) {
+      setMultiple(multiple + 6);
+      setLoader(false);
+    } else {
+      console.log("try to fetch again,error");
+    }
+  }, [show]);
   function scrollHandle(e) {
-    // console.log(e);
-    if (
-      e.target.offsetHeight + e.target.scrollTop + 1 >
-      e.target.scrollHeight
-    ) {
+    if (e.target.offsetHeight + e.target.scrollTop > e.target.scrollHeight) {
+      setShow((prev) => prev + 1);
       setLoader(true);
-      const examplePromise = new Promise((resolve, reject) => {
-        setTimeout(() => {
-          resolve(200);
-        }, 3000);
-      });
-      examplePromise
-        .then((data) => {
-          setMultiple(multiple + 6);
-          setLoader(false);
-        })
-        .catch((data) => {
-          console.log("error");
-        });
+    } else {
+      setShow(0);
     }
   }
   return (
