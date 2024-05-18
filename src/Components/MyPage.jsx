@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useEffect } from "react";
 import { Spinner } from "@chakra-ui/react";
 
@@ -7,11 +7,16 @@ export default function MyPage() {
   const [loader, setLoader] = useState(false);
   const [multiple, setMultiple] = useState(6);
   const [show, setShow] = useState(0);
-  let counter = 0;
-
+  const scrollHandle = throttle((e) => {
+    if (e.target.offsetHeight + e.target.scrollTop > e.target.scrollHeight) {
+      setShow((prev) => prev + 1);
+      setLoader(true);
+    } else {
+      setShow(0);
+    }
+  }, 1000);
   useEffect(() => {
-    let val = 6 * counter;
-    let res = multiple - val;
+    let res = multiple - 6;
     fetch(`https://dummyjson.com/products?limit=${6}&skip=${res}`)
       .then((data) => {
         return data.json();
@@ -20,7 +25,6 @@ export default function MyPage() {
         console.log(multiple);
         console.log(data.products);
         setResult([...result, ...data.products]);
-        counter = counter + 1;
       })
       .catch((err) => {
         console.log(err);
@@ -28,6 +32,7 @@ export default function MyPage() {
   }, [multiple]);
 
   useEffect(() => {
+    // console.log(show);
     if (show === 1) {
       setMultiple(multiple + 6);
       setLoader(false);
@@ -35,13 +40,23 @@ export default function MyPage() {
       console.log("try to fetch again,error");
     }
   }, [show]);
-  function scrollHandle(e) {
-    if (e.target.offsetHeight + e.target.scrollTop > e.target.scrollHeight) {
-      setShow((prev) => prev + 1);
-      setLoader(true);
-    } else {
-      setShow(0);
-    }
+  function throttle(callBackFunc, delay) {
+    let firstCall = true;
+    let lastArgs = [];
+    let timeOutId = null;
+    return (...args) => {
+      lastArgs = args;
+      if (firstCall) {
+        callBackFunc(...lastArgs);
+        firstCall = false;
+        return;
+      }
+      if (timeOutId) return;
+      timeOutId = setTimeout(() => {
+        callBackFunc(...lastArgs);
+        timeOutId = null;
+      }, delay);
+    };
   }
   return (
     <>
@@ -60,6 +75,7 @@ export default function MyPage() {
                 alt={`Image with Id: ${item.id}`}
                 className="image"
               />
+              <p>{`Img Id:${item.id}, Img Name:${item.title}`}</p>
             </div>
           );
         })}
